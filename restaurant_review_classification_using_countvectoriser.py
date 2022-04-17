@@ -1,94 +1,34 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
+#Reading data
 import pandas as pd
 A = pd.read_csv("C:/Users/akaks/Downloads/Restaurant_Reviews.tsv",sep="\t")
-
-
-# In[2]:
-
-
 A.head()
 
-
-# # Removing the special characters
-
-# In[3]:
-
-
+#Removing Special Characters
 Q = []
 from re import sub
 for i in A.Review:
     Q.append(sub("[^a-zA-Z0-9 ]","",i.upper()))
-
-
-# In[4]:
-
-
+    
+#Converting data into vectorised format
 from sklearn.feature_extraction.text import CountVectorizer
 cv = CountVectorizer()
 
-
-# In[22]:
-
-
-#Q
-
-
-# In[5]:
-
-
 word_vect = cv.fit_transform(Q).toarray()
 
-
-# In[6]:
-
-
-word_vect
-
-
-# In[7]:
-
-
+#Getting all the words
 words = cv.get_feature_names()
 
-
-# In[23]:
-
-
-#words
-
-
-# # Spliting the data into training and testing set
-
-# In[9]:
-
-
+#Defining X and Y
 X = word_vect
 Y = A.Liked
 
-
-# In[10]:
-
-
+#Spliting data in training and testing set
 from sklearn.model_selection import train_test_split
 xtrain,xtest,ytrain,ytest = train_test_split(X,Y,test_size=0.2,random_state=21)
 
-
-# In[11]:
-
-
 X.shape
 
-
-# # Creating a Neural Network
-
-# In[12]:
-
-
+#Creating Neural Network
 from keras.models import Sequential
 from keras.layers import Dense,Dropout
 nn = Sequential()
@@ -97,25 +37,11 @@ nn.add(Dropout(0.6))
 nn.add(Dense(1000))
 nn.add(Dropout(0.6))
 nn.add(Dense(1,activation="sigmoid"))
-
-
-# In[13]:
-
-
 nn.compile(loss="binary_crossentropy",metrics="accuracy")
 nn.fit(xtrain,ytrain,epochs=10,)
 
-
-# # Predicting on testing set
-
-# In[14]:
-
-
+#predicting on testing data
 nn.predict(xtest)
-
-
-# In[15]:
-
 
 q=[]
 for i in nn.predict(xtest):
@@ -123,22 +49,12 @@ for i in nn.predict(xtest):
         q.append(0)
     else:
         q.append(1)
-        
-    
 
-
-# In[16]:
-
-
+#Checking The accuracy of model
 from sklearn.metrics import accuracy_score
 accuracy_score(ytest,q)
 
-
-# # creating Function to classify the review
-
-# In[20]:
-
-
+#Defining Function for Review Classification
 def review_classification(str_):
     z = []
     z.append(sub("[^A-Za-z0-9 ]","",str_.upper()))
@@ -150,15 +66,4 @@ def review_classification(str_):
         else:
             print("Liked")
 
-
-# In[21]:
-
-
 review_classification("awesome")
-
-
-# In[ ]:
-
-
-
-
